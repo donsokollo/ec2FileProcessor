@@ -29,26 +29,10 @@ public class ImageProcessor {
             e.printStackTrace();
         }
     }
-    public void saveImage(){
-        try{
-            File outputfile = new File("abc.png");
-            ImageIO.write(img, "png", outputfile);
-        } catch (IOException e) {
-            e.fillInStackTrace();
-        }
-    }
 
 
 
-    public S3ObjectInputStream changeImage(){
-//        AffineTransform at = new AffineTransform();
-//        at.rotate(Math.PI/2, img.getHeight()/2,img.getWidth()/2);
-//        AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-//
-//        BufferedImage newImage =new BufferedImage(img.getHeight(), img.getWidth(), img.getType()); //20, 20 is a height and width of img ofc
-//
-//        op.filter(img, newImage);
-//        this.img = newImage;
+    public InputStream changeImage(){
 
         BufferedImage oldImage = img;
         BufferedImage newImage = new BufferedImage(oldImage.getHeight(), oldImage.getWidth(), BufferedImage.TYPE_INT_ARGB);
@@ -70,6 +54,6 @@ public class ImageProcessor {
             e.printStackTrace();
         }
         InputStream is = new ByteArrayInputStream(output.toByteArray(), 0, output.size());
-        return (S3ObjectInputStream) is;
+        return (InputStream) is;
     }
 }

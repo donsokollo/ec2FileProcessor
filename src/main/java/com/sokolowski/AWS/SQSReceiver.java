@@ -6,10 +6,7 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
@@ -133,12 +130,13 @@ public static void main(String[] args){
         System.out.println("Content-Type: "  + object.getObjectMetadata().getContentType());
 
         ImageProcessor imageProc=new ImageProcessor(object.getObjectContent());
-        S3ObjectInputStream newImage= imageProc.changeImage();
+
+        InputStream newImage= imageProc.changeImage();
         object.setObjectContent(newImage);
-        imageProc.saveImage();
-
-
-
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(newImage.available());
+       // metadata.addUserMetadata("modified","true");
+        object.setObjectMetadata(metadata);
         System.out.println("Deleting an object\n");
         s3.deleteObject(bucketName, key);
 
@@ -151,15 +149,5 @@ public static void main(String[] args){
         s3.putObject(new PutObjectRequest(bucketName, key, object.getObjectContent(), object.getObjectMetadata()));
     }
 
-    private static void displayTextInputStream(InputStream input) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        while (true) {
-            String line = reader.readLine();
-            if (line == null) break;
-
-            System.out.println("    " + line);
-        }
-        System.out.println();
-    }
 
 }
